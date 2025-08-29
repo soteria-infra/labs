@@ -80,7 +80,7 @@ playground/lab_001_role_confusion
 │   ├── attack-vectors.md       # Detailed attack documentation
 │   ├── defense-strategies.md   # Security implementation guide
 │   └── security-report.md      # Comprehensive analysis report
-├── tests/
+├── src/
 │   ├── vulnerable_llm.py   # Unprotected baseline implementation
 │   ├── protected_ll,.py    # Security-enhanced version
 ```
@@ -105,7 +105,7 @@ Ensure your Soteria API key is configured, the toggle is at protected, and obser
 
 ## Key Files
 
-### `tests/vulnerable_llm.py`
+### `src/vulnerable_llm.py`
 Basic conversational AI implementation with no security measures. Demonstrates baseline functionality and vulnerability to attacks.
 
 **Key Features:**
@@ -113,7 +113,7 @@ Basic conversational AI implementation with no security measures. Demonstrates b
 - Conversation context management
 - No input validation or security filtering
 
-### `tests/protected_llm.py`
+### `src/protected_llm.py`
 Enhanced version with Soteria SDK security integration. Shows how to implement effective defenses while maintaining functionality.
 
 **Key Features:**
@@ -248,11 +248,6 @@ After completing this lab, you should be able to:
 5. **Analyze Security Trade-offs**: Understand performance vs. security considerations
 
 ## Next Steps
-
-### Advanced Topics
-- Explore additional attack vectors documented in `docs/attack-vectors.md`
-- Study defense strategies in `docs/defense-strategies.md`
-- Review comprehensive analysis in `docs/security-report.md`
 
 ### Extended Learning
 - Implement custom security rules for your organization

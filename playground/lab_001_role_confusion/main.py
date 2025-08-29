@@ -8,8 +8,8 @@ import soteria_sdk # Import soteria_sdk for error handling
 
 # Import the separate implementations' specific functions/objects
 # We need to import the module as a whole to access its top-level variables (template, chain)
-from tests import protected_llm
-from tests import vulnerable_llm
+from src import protected_llm
+from src import vulnerable_llm
 
 
 app = FastAPI()

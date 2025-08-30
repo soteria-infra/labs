@@ -46,12 +46,6 @@ cd playground/lab_001_role_confusion
 
 ### 2. Environment Setup
 ```bash
-# Create virtual environment
-uv venv --python 3.11 --prompt 001-role-confusion
-
-# Activate virtual environment
-source .venv/bin/activate
-
 # Install dependencies
 uv sync
 ```
@@ -80,9 +74,9 @@ playground/lab_001_role_confusion
 │   ├── attack-vectors.md       # Detailed attack documentation
 │   ├── defense-strategies.md   # Security implementation guide
 │   └── security-report.md      # Comprehensive analysis report
-├── src/
+├── llms/
 │   ├── vulnerable_llm.py   # Unprotected baseline implementation
-│   ├── protected_ll,.py    # Security-enhanced version
+│   ├── protected_llm.py    # Security-enhanced version
 ```
 
 ## Quick Start Guide
@@ -93,7 +87,7 @@ playground/lab_001_role_confusion
 ollama serve
 
 # Terminal 2: Start server
-uv run main.py
+uv run fastapi dev
 ```
 
 ### Testing Attack Scenarios
@@ -105,7 +99,7 @@ Ensure your Soteria API key is configured, the toggle is at protected, and obser
 
 ## Key Files
 
-### `src/vulnerable_llm.py`
+### `llms/vulnerable_llm.py`
 Basic conversational AI implementation with no security measures. Demonstrates baseline functionality and vulnerability to attacks.
 
 **Key Features:**
@@ -113,7 +107,7 @@ Basic conversational AI implementation with no security measures. Demonstrates b
 - Conversation context management
 - No input validation or security filtering
 
-### `src/protected_llm.py`
+### `llms/protected_llm.py`
 Enhanced version with Soteria SDK security integration. Shows how to implement effective defenses while maintaining functionality.
 
 **Key Features:**
@@ -124,10 +118,10 @@ Enhanced version with Soteria SDK security integration. Shows how to implement e
 ## Usage Examples
 
 ### Basic Vulnerability Testing
-Start the server, and go to the chat inetrface
-```python
+Start the server, and go to the chat interface
+```bash
 # Start vulnerable system
-uv run main.py
+uv run fastapi dev
 
 # Test with role confusion attack
 You: [Paste INFOTRON attack payload]
@@ -138,7 +132,7 @@ You: [Paste INFOTRON attack payload]
 
 ### Security Validation
 Refresh the chat interface and paste in the same compromising prompt
-```python
+```bash
 
 # Test with same attack
 You: [Paste INFOTRON attack payload]

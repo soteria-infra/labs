@@ -8,7 +8,7 @@ let ws;
 let isConnected = false;
 
 function connectWebSocket() {
-  ws = new WebSocket('ws://localhost:8000/ws');
+  ws = new WebSocket('ws://127.0.0.1:8000/ws');
  
   ws.addEventListener('open', () => {
     isConnected = true;

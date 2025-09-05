@@ -1,0 +1,199 @@
+/* Chat bubble styling */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f0f2f5; /* Light grey background for the whole page */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: #ffffff; /* White header background */
+  padding: 15px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+.header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.status-tag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-protected {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.status-vulnerable {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Default grey for off */
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3; /* Blue for on */
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.chat-container {
+  flex-grow: 1; /* Allows the chat container to fill available vertical space */
+  display: flex;
+  flex-direction: column;
+  max-width: 800px; /* Max width for chat interface */
+  margin: 20px auto; /* Center the chat interface horizontally */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* More prominent shadow */
+  overflow: hidden; /* Ensures rounded corners apply to children */
+}
+
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+  background-color: #e5ddd5; /* WhatsApp-like background */
+  display: flex; /* Use flexbox for messages */
+  flex-direction: column; /* Stack messages vertically */
+}
+
+.message-container {
+  display: flex;
+  align-items: flex-start; /* Align to top of bubble */
+  margin-bottom: 10px; /* Spacing between messages */
+}
+
+.message-bubble {
+  background-color: #f8f9fa; /* Light background for AI messages */
+  padding: 10px 16px;
+  border-radius: 18px;
+  max-width: 75%; /* Slightly more width for messages */
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  white-space: pre-wrap; /* Preserve whitespace and line breaks */
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.sender-message-container {
+  justify-content: flex-end; /* Align sender messages to the right */
+}
+
+.sender-message-bubble {
+  background-color: #007bff; /* Blue for sender messages */
+  color: white;
+}
+
+.system-message {
+  text-align: center;
+  color: #6c757d;
+  font-size: 13px;
+  font-style: italic;
+  margin: 5px 0 15px; /* More space after system messages */
+}
+
+.message-input-container {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #f0f2f5; /* Match body background */
+  border-top: 1px solid #e9ecef;
+}
+
+#messageInput {
+  flex-grow: 1;
+  margin-right: 10px;
+  border: 1px solid #ced4da;
+  outline: none;
+  border-radius: 25px;
+  min-height: 20px; /* Ensure input is not too small */
+  font-size: 16px;
+  background-color: #ffffff;
+  padding: 10px 16px;
+  resize: none; /* Disable manual textarea resize */
+}
+
+#messageInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#sendButton {
+  background-color: #007bff;
+  border-radius: 25px;
+  outline: none;
+  border: none;
+  padding: 12px 20px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#sendButton:hover {
+  background-color: #0056b3;
+}
+
+#sendButton:active {
+  background-color: #004085;
+}
+
+#sendButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}

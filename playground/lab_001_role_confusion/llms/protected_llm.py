@@ -3,8 +3,14 @@ import soteria_sdk
 
 from llms.cli import get_conversation_handle_fn
 from llms.core import DEFAULT_CHAT_TEMPLATE, init_model
+from dotenv import load_dotenv
+import os
 
-soteria_sdk.configure(api_key="your-api-key", api_base="https://api.soteriainfra.com")
+load_dotenv()
+
+soteria_api_key=os.getenv("SOTERIA_API_KEY")
+
+soteria_sdk.configure(api_key=soteria_api_key, api_base="https://api.soteriainfra.com")
 
 chat_prompt_template = ChatPromptTemplate.from_template(DEFAULT_CHAT_TEMPLATE)
 chain = chat_prompt_template | init_model()
@@ -12,7 +18,7 @@ chain = chat_prompt_template | init_model()
 
 # This is the function that needs protection - it processes the user input
 @soteria_sdk.guard_jailbreak
-def protected_llm_call(prompt: str):
+def protected_llm_call(prompt: Any):
     """
     Protected LLM call that blocks jailbreak attempts.
     """
@@ -57,6 +63,8 @@ Conversation History:
 Question:
 {user_input}
 Answer:"""
+        # Add this print statement:
+        print(f"--- Backend: Initial full_prompt sent to LLM ---\n'{full_prompt}'\n---------------------------------------------------------")
 
         # Use the protected function
         result = protected_llm_call(prompt=full_prompt)

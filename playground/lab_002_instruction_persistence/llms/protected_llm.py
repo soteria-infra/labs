@@ -1,8 +1,7 @@
 import os
 import uuid
-from typing import Any # Import Any for type hinting the prompt argument
-import soteria_sdk # Import the Soteria SDK
-
+from typing import Any
+import soteria_sdk
 from langchain_community.chat_message_histories.file import FileChatMessageHistory
 from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import StrOutputParser
@@ -11,143 +10,87 @@ from langchain_core.messages import SystemMessage
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.runnables import ConfigurableFieldSpec
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
 # --- Soteria SDK Configuration ---
-# IMPORTANT: Replace "your-api-key" with your actual Soteria API key.
-# This configures the SDK to communicate with Soteria's services.
-soteria_api_key=os.getenv("SOTERIA_API_KEY")
+soteria_api_key = os.getenv("SOTERIA_API_KEY")
+if not soteria_api_key:
+    print("WARNING: SOTERIA_API_KEY environment variable not set. Soteria protection will not be active.")
+else:
+    soteria_sdk.configure(api_key=soteria_api_key, api_base="https://api.soteriainfra.com")
 
-soteria_sdk.configure(api_key=soteria_api_key, api_base="https://api.soteriainfra.com")
 
-# Define a directory to store your JSON history files
-HISTORY_DIR = "json_chat_histories_auto_id_protected" # Changed directory name to distinguish
-# Create the directory if it doesn't exist
-os.makedirs(HISTORY_DIR, exist_ok=True)
+HISTORY_DIR_PROTECTED = "json_chat_histories_auto_id_protected"
+os.makedirs(HISTORY_DIR_PROTECTED, exist_ok=True)
 
-def get_session_history(session_id: str, user_id: str):
+def get_session_history_protected(session_id: str, user_id: str):
     """
-    Retrieves or creates a file-based chat message history for a given session and user.
+    Retrieves or creates a file-based chat message history for a given session and user in protected mode.
     """
     file_name = f"history_{user_id}_{session_id}.json"
-    file_path = os.path.join(HISTORY_DIR, file_name)
-    print(f"Loading/creating JSON history file: {file_path}")
+    file_path = os.path.join(HISTORY_DIR_PROTECTED, file_name)
     return FileChatMessageHistory(file_path=file_path)
 
-# Initialize the LLM
 try:
-    model = OllamaLLM(model="llama3.2")
-    parser = StrOutputParser()
+    model_protected = OllamaLLM(model="llama3.2")
+    parser_protected = StrOutputParser()
 except Exception as e:
-    print(f"Error initializing OllamaLLM or StrOutputParser: {e}")
-    exit()
+    print(f"Error initializing OllamaLLM or StrOutputParser for protected mode: {e}")
+    model_protected = None
+    parser_protected = None
 
-# Define the chat prompt template
-chat_prompt_template = ChatPromptTemplate.from_messages([
+
+chat_prompt_template_protected = ChatPromptTemplate.from_messages([
     SystemMessage(content="You are a helpful assistant. Answer all questions to the best of your ability."),
     MessagesPlaceholder(variable_name="history"),
     HumanMessagePromptTemplate.from_template("{question}")
 ])
 
-# Create the chain: prompt -> model -> parser
-chain = chat_prompt_template | model | parser
+if model_protected and parser_protected:
+    chain_base_protected = chat_prompt_template_protected | model_protected | parser_protected
+else:
+    chain_base_protected = None
 
-# Wrap the chain with history management
-runnable_with_history = RunnableWithMessageHistory(
-    runnable=chain,
-    input_messages_key="question",
-    get_session_history=get_session_history,
-    history_factory_config=[
-        ConfigurableFieldSpec(
-            id="session_id",
-            annotation=str,
-            name="Session ID",
-            description="Unique identifier for the conversation session.",
-            default="",
-            is_shared=True
-        ),
-        ConfigurableFieldSpec(
-            id="user_id",
-            annotation=str,
-            name="User ID",
-            description="Unique identifier for the user.",
-            default="",
-            is_shared=True
-        ),
-    ],
-    history_messages_key="history"
-)
+runnable_with_history_protected = None
+if chain_base_protected:
+    runnable_with_history_protected = RunnableWithMessageHistory(
+        runnable=chain_base_protected,
+        input_messages_key="question",
+        get_session_history=get_session_history_protected,
+        history_factory_config=[
+            ConfigurableFieldSpec(
+                id="session_id",
+                annotation=str,
+                name="Session ID",
+                description="Unique identifier for the conversation session.",
+                default="",
+                is_shared=True
+            ),
+            ConfigurableFieldSpec(
+                id="user_id",
+                annotation=str,
+                name="User ID",
+                description="Unique identifier for the user.",
+                default="",
+                is_shared=True
+            ),
+        ],
+        history_messages_key="history"
+    )
 
-# --- Protected LLM Call Function ---
-# This function is decorated by Soteria SDK to guard against prompt injection.
 @soteria_sdk.guard_prompt_injection
-def protected_llm_call(prompt: Any, session_id: str, user_id: str):
+def protected_chat_handler(prompt: str, session_id: str, user_id: str):
     """
     Protected LLM call that blocks prompt injection attempts.
     The 'prompt' argument will be inspected by the Soteria SDK.
     """
-    # This function directly invokes the LangChain runnable with history.
-    # The `prompt` argument passed to this function is the user's query.
-    return runnable_with_history.invoke(
-        {"question": prompt}, # Pass the 'prompt' argument (which is the user's query) as the question
+    if runnable_with_history_protected is None:
+        return "LLM service for protected mode is unavailable due to an initialization error."
+
+    return runnable_with_history_protected.invoke(
+        {"question": prompt},
         config={"configurable": {"session_id": session_id, "user_id": user_id}}
     )
 
-# --- Modified Interaction Loop with Auto-Generated IDs and SDK Protection ---
-if __name__ == "__main__":
-    print("\n--- AI Chatbot with Auto-Generated IDs and Soteria SDK Protection ---")
-    print("Type 'new' to start a fresh session, 'exit' to quit.")
-
-    # Generate a user ID once for this program run
-    current_user_id = str(uuid.uuid4())
-    print(f"Your User ID for this run: {current_user_id}")
-
-    # Generate an initial session ID
-    current_session_id = str(uuid.uuid4())
-    print(f"Initial Session ID: {current_session_id}")
-
-    while True:
-        print(f"\n--- Current Session: {current_session_id}, User: {current_user_id} ---")
-        action = input("Enter 'new' for a new session, 'chat' to continue, or 'exit' to quit: ").strip().lower()
-
-        if action == "exit":
-            print("Exiting program.")
-            break
-        elif action == "new":
-            current_session_id = str(uuid.uuid4()) # Generate a new session ID
-            print(f"Starting a new session. New Session ID: {current_session_id}")
-            continue # Restart the outer loop to show new IDs and prompt for chat
-        elif action == "chat":
-            print("Type your message, or 'end' to go back to session menu, 'exit' to quit program.")
-            while True: # Inner loop for continuous conversation within the same session/user
-                user_query = input("You: ").strip()
-
-                if user_query.lower() == "end":
-                    print("Ending current chat session.")
-                    break # Break out of the inner loop to go back to the session menu
-                if user_query.lower() == "exit":
-                    action = "exit" # Set outer loop condition to exit
-                    break # Break out of inner loop
-
-                try:
-                    # Call the protected function instead of directly invoking runnable_with_history
-                    response = protected_llm_call(
-                        prompt=user_query, # The user's query is the prompt to be guarded
-                        session_id=current_session_id,
-                        user_id=current_user_id
-                    )
-                    print(f"AI: {response}")
-                except soteria_sdk.SoteriaValidationError as e:
-                    # This exception is raised by the SDK if a prompt injection is detected
-                    print(f"AI: I can't process that request. Security filter activated. Details: {e}")
-                except Exception as e:
-                    print(f"AI: An error occurred while processing your request: {e}")
-
-            if action == "exit": # Check if the user wanted to exit the program entirely
-                break
-        else:
-            print("Invalid input. Please type 'new', 'chat', or 'exit'.")
-
-    print("Goodbye!")
+template_protected = chat_prompt_template_protected

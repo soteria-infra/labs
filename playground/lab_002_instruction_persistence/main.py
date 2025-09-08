@@ -1,92 +1,105 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse # Added import for FileResponse
+from fastapi.responses import FileResponse
 import json
+import uuid
 from typing import Dict
 import uvicorn
-import soteria_sdk # Import soteria_sdk for error handling
+import soteria_sdk
 
-# Import the separate implementations' specific functions/objects
-# We need to import the module as a whole to access its top-level variables (template, chain)
-from llms import protected_llm
-from llms import vulnerable_llm
-
+from llms.protected_llm import protected_chat_handler
+from llms.vulnerable_llm import runnable_with_history_vulnerable
 
 app = FastAPI()
 
-# Serve static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def read_index():
     return FileResponse('static/index.html')
 
-# Store contexts for each connection
-contexts: Dict[WebSocket, str] = {}
-protection_modes: Dict[WebSocket, bool] = {}
+class ConnectionState:
+    def __init__(self):
+        self.session_id = str(uuid.uuid4())
+        self.user_id = str(uuid.uuid4())   
+        self.protection_mode = True        
+
+
+connection_states: Dict[WebSocket, ConnectionState] = {}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    contexts[websocket] = "The conversation has just begun."
-    protection_modes[websocket] = True  # Default to protected
-   
+    state = ConnectionState()
+    connection_states[websocket] = state
+
+    print(f"New WebSocket connection established. Session ID: {state.session_id}, User ID: {state.user_id}")
+    await websocket.send_text(f"Mode switched to: {'protected' if state.protection_mode else 'vulnerable'}")
+
+
     try:
         while True:
             data = await websocket.receive_text()
-           
+
             try:
                 message_data = json.loads(data)
-               
+
                 if message_data.get("type") == "toggle":
-                    # Toggle protection mode
-                    protection_modes[websocket] = message_data.get("protected", True)
-                    mode = "protected" if protection_modes[websocket] else "vulnerable"
+                    state.protection_mode = message_data.get("protected", True)
+                    mode = "protected" if state.protection_mode else "vulnerable"
                     await websocket.send_text(f"Mode switched to: {mode}")
                     continue
-                   
+
                 elif message_data.get("type") == "chat":
                     user_input = message_data.get("message", "")
                 else:
                     user_input = data
-                   
             except json.JSONDecodeError:
                 user_input = data
-           
+
             if not user_input.strip():
                 continue
-               
-            context = contexts[websocket]
-            result = "" # Initialize result
 
-            # Use the appropriate implementation
-            if protection_modes[websocket]:
+            result = ""
+
+            if state.protection_mode:
                 try:
-                    # Construct the full prompt string for the protected LLM
-                    full_prompt = protected_llm.template.format(context=context, question=user_input)
-                    result = protected_llm.protected_llm_call(prompt=full_prompt)
-                except soteria_sdk.SoteriaValidationError:
-                    result = "I can't process that request. Security filter activated."
+                    result = protected_chat_handler(
+                        prompt=user_input,
+                        session_id=state.session_id,
+                        user_id=state.user_id
+                    )
+                except soteria_sdk.SoteriaValidationError as e:
+                    result = f"AI: I can't process that request. Security filter activated. Details: {e}"
                 except Exception as e:
                     result = f"Sorry, I encountered an error in protected mode: {e}"
             else:
-                try:
-                    # Directly invoke the vulnerable chain
-                    llm_response = vulnerable_llm.chain.invoke({"context": context, "question": user_input})
-                    result = llm_response.strip()
-                except Exception as e:
-                    result = f"Sorry, I encountered an error in vulnerable mode: {e}"
-           
-            # Update context
-            contexts[websocket] += f"\nUser: {user_input}\nAI: {result}"
-           
+                if runnable_with_history_vulnerable is None:
+                    result = "LLM service for vulnerable mode is unavailable due to an initialization error."
+                else:
+                    try:
+                        llm_response = runnable_with_history_vulnerable.invoke(
+                            {"question": user_input},
+                            config={"configurable": {"session_id": state.session_id, "user_id": state.user_id}}
+                        )
+                        result = llm_response.strip()
+                    except Exception as e:
+                        result = f"Sorry, I encountered an error in vulnerable mode: {e}"
+
             await websocket.send_text(result)
-               
+
     except WebSocketDisconnect:
-        if websocket in contexts:
-            del contexts[websocket]
-        if websocket in protection_modes:
-            del protection_modes[websocket]
+        print(f"WebSocket disconnected. Session ID: {state.session_id}, User ID: {state.user_id}")
+        if websocket in connection_states:
+            del connection_states[websocket]
+    except Exception as e:
+        print(f"An unexpected error occurred in WebSocket connection (Session ID: {state.session_id}, User ID: {state.user_id}): {e}")
+        try:
+            await websocket.send_text(f"Server error: {e}")
+        except RuntimeError:
+            pass
+        if websocket in connection_states:
+            del connection_states[websocket]
 
 if __name__ == "__main__":
     print("Starting FastAPI chat server...")

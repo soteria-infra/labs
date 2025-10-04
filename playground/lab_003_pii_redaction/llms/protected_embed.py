@@ -4,6 +4,8 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
+
+from config import settings
 from llms.get_vector_db import get_vector_db
 import soteria_sdk
 from dotenv import load_dotenv
@@ -14,18 +16,17 @@ from custom_loggers import DEFAULT_LOGGER
 load_dotenv()
 
 # Configure Soteria SDK
-soteria_api_key = os.getenv("SOTERIA_API_KEY")
-DEFAULT_LOGGER.debug(f"DEBUG: Soteria API Key present: {bool(soteria_api_key)}")
+DEFAULT_LOGGER.debug(
+    f"DEBUG: Soteria API Key present: {bool(settings.SOTERIA_API_KEY)}"
+)
 
-if soteria_api_key:
+if settings.SOTERIA_API_KEY:
     soteria_sdk.configure(
-        api_key=soteria_api_key, api_base="https://api.soteriainfra.com"
+        api_key=settings.SOTERIA_API_KEY, api_base="https://api.soteriainfra.com"
     )
     DEFAULT_LOGGER.debug("Soteria SDK configured")
 else:
     DEFAULT_LOGGER.warn("No Soteria API Key found!")
-
-TEMP_FOLDER = os.getenv("TEMP_FOLDER", "./_temp")
 
 
 def allowed_file(filename):
@@ -38,7 +39,7 @@ def save_file(file):
     ct = datetime.now()
     ts = ct.timestamp()
     filename = str(ts) + "_" + secure_filename(file.filename)
-    file_path = os.path.join(TEMP_FOLDER, filename)
+    file_path = os.path.join(settings.TEMP_FOLDER, filename)
     file.save(file_path)
     return file_path
 
@@ -59,7 +60,7 @@ def load_and_process_json(file_path):
             raw_content = f.read()
 
         try:
-            if soteria_api_key:
+            if settings.SOTERIA_API_KEY:
                 scanned_content = scan_pii_with_soteria(prompt=raw_content)
             else:
                 scanned_content = raw_content

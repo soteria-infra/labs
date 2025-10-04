@@ -6,7 +6,8 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from llms.get_vector_db import get_vector_db
 
-LLM_MODEL = os.getenv('LLM_MODEL', 'llama3.2')
+LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")
+
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
@@ -29,6 +30,7 @@ def get_prompt():
 
     return QUERY_PROMPT, prompt
 
+
 # Main function to handle the query process
 def query(input):
     if input:
@@ -41,9 +43,7 @@ def query(input):
 
         # Set up the retriever to generate multiple queries using the language model and the query prompt
         retriever = MultiQueryRetriever.from_llm(
-            db.as_retriever(), 
-            llm,
-            prompt=QUERY_PROMPT
+            db.as_retriever(), llm, prompt=QUERY_PROMPT
         )
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output

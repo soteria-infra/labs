@@ -1,8 +1,9 @@
 import os
 import shutil
 
+from config import settings
 from llms.cli import get_conversation_handle_fn
-from llms.core import TEMP_FOLDER, query_chat_processing_fn
+from llms.core import query_chat_processing_fn
 
 
 from llms.embed import embed
@@ -19,7 +20,7 @@ def process_and_embed_file(file_path: str) -> dict:
         return {"success": False, "error": f"File not found: {file_path}"}
 
     filename = os.path.basename(file_path)
-    temp_filepath = os.path.join(TEMP_FOLDER, filename)
+    temp_filepath = os.path.join(settings.TEMP_FOLDER, filename)
     cleanup_temp_file = False
 
     try:

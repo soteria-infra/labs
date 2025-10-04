@@ -8,11 +8,8 @@ def get_vector_db():
     embedding = OllamaEmbeddings(
         model=settings.TEXT_EMBEDDING_MODEL, show_progress=True
     )
-
-    db = Chroma(
+    return Chroma(
         collection_name=settings.COLLECTION_NAME,
         persist_directory=settings.CHROMA_PATH,
         embedding_function=embedding,
     )
-
-    return db

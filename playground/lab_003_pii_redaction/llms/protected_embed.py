@@ -10,15 +10,13 @@ from llms.get_vector_db import get_vector_db
 import soteria_sdk
 from dotenv import load_dotenv
 
-from llms.cleaner import clean_dirty_json
+from llms.utils import clean_json_str
 from custom_loggers import DEFAULT_LOGGER
 
 load_dotenv()
 
 # Configure Soteria SDK
-DEFAULT_LOGGER.debug(
-    f"DEBUG: Soteria API Key present: {bool(settings.SOTERIA_API_KEY)}"
-)
+DEFAULT_LOGGER.debug(f"Soteria API Key present: {bool(settings.SOTERIA_API_KEY)}")
 
 if settings.SOTERIA_API_KEY:
     soteria_sdk.configure(
@@ -72,7 +70,7 @@ def load_and_process_json(file_path):
         except Exception:
             scanned_content = raw_content
 
-        cleaned_json = clean_dirty_json(scanned_content)
+        cleaned_json = clean_json_str(scanned_content)
         try:
             json_data = json.loads(cleaned_json)
         except json.JSONDecodeError:

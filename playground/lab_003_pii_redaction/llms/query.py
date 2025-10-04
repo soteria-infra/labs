@@ -10,7 +10,7 @@ from llms.get_vector_db import get_vector_db
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
-    QUERY_PROMPT = PromptTemplate(
+    query_prompt = PromptTemplate(
         input_variables=["question"],
         template="""You are an AI language model assistant. Your task is to generate five
         different versions of the given user question to retrieve relevant documents from
@@ -20,14 +20,13 @@ def get_prompt():
         Original question: {question}""",
     )
 
-    template = """Answer the question based ONLY on the following context:
+    template = """\
+    Answer the question based ONLY on the following context:
     {context}
     Question: {question}
     """
 
-    prompt = ChatPromptTemplate.from_template(template)
-
-    return QUERY_PROMPT, prompt
+    return query_prompt, ChatPromptTemplate.from_template(template)
 
 
 # Main function to handle the query process
@@ -38,11 +37,11 @@ def query(input):
         # Get the vector database instance
         db = get_vector_db()
         # Get the prompt templates
-        QUERY_PROMPT, prompt = get_prompt()
+        query_prompt, prompt = get_prompt()
 
         # Set up the retriever to generate multiple queries using the language model and the query prompt
         retriever = MultiQueryRetriever.from_llm(
-            db.as_retriever(), llm, prompt=QUERY_PROMPT
+            db.as_retriever(), llm, prompt=query_prompt
         )
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output

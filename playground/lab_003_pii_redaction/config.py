@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     COLLECTION_NAME: str = "local-rag"
     TEXT_EMBEDDING_MODEL: str = "nomic-embed-text"
 
-    @property
     @computed_field
+    @property
     def TEMP_FOLDER(self) -> Path:
         return self.BASE_DIR / ".temp"
 

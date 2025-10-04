@@ -13,7 +13,8 @@ from fastapi import (
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from llms.core import TEMP_FOLDER
+
+from config import settings
 from llms import protected_llm, vulnerable_llm
 from websocket_primitives import WSMessage, WSToggleMessage, WSChatMessage
 from custom_loggers import DEFAULT_LOGGER, WS_LOGGER, LLM_LOGGER
@@ -46,8 +47,8 @@ async def upload_document_endpoint(
         )
 
     # Ensure the TEMP_FOLDER exists
-    os.makedirs(TEMP_FOLDER, exist_ok=True)
-    temp_file_path = os.path.join(TEMP_FOLDER, file.filename)
+    os.makedirs(settings.TEMP_FOLDER, exist_ok=True)
+    temp_file_path = os.path.join(settings.TEMP_FOLDER, file.filename)
 
     try:
         # Save the uploaded file temporarily

@@ -1,12 +1,12 @@
 from typing import Callable
 
-CHAT_START_DISPLAY = """
+CHAT_START_DISPLAY = """\
 --- AI Chatbot (Powered by Llama3.2) ---
 Ask me anything! Type 'exit' when you're done.
 ----------------------------------------
 """
 
-CHAT_END_DISPLAY = """
+CHAT_END_DISPLAY = """\
 ----------------------------------------
 Llama3.2: Goodbye! Thanks for chatting.
 ----------------------------------------

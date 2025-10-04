@@ -2,11 +2,12 @@ import os
 from dotenv import load_dotenv
 import shutil
 
+from config import settings
 from llms.cli import get_conversation_handle_fn
 
 
 from llms.core import query_chat_processing_fn
-from llms.protected_embed import TEMP_FOLDER, embed
+from llms.protected_embed import embed
 from custom_loggers import DEFAULT_LOGGER
 
 
@@ -23,7 +24,7 @@ def process_and_embed_file_protected(file_path: str) -> dict:
         return {"success": False, "error": f"File not found: {file_path}"}
 
     filename = os.path.basename(file_path)
-    temp_filepath = os.path.join(TEMP_FOLDER, filename)
+    temp_filepath = os.path.join(settings.TEMP_FOLDER, filename)
     cleanup_temp_file = False
 
     try:

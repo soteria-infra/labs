@@ -2,11 +2,11 @@ import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from config import settings
 from llms.get_vector_db import get_vector_db
 
 from custom_loggers import DEFAULT_LOGGER
-
-TEMP_FOLDER = os.getenv("TEMP_FOLDER", "./_temp")
 
 
 # Function to check if the uploaded file is allowed
@@ -20,7 +20,7 @@ def save_file(file):
     ct = datetime.now()
     ts = ct.timestamp()
     filename = str(ts) + "_" + secure_filename(file.filename)
-    file_path = os.path.join(TEMP_FOLDER, filename)
+    file_path = os.path.join(settings.TEMP_FOLDER, filename)
     file.save(file_path)
     return file_path
 

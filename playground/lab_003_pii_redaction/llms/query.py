@@ -1,12 +1,11 @@
-import os
 from langchain_community.chat_models import ChatOllama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
-from llms.get_vector_db import get_vector_db
 
-LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")
+from config import settings
+from llms.get_vector_db import get_vector_db
 
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
@@ -35,7 +34,7 @@ def get_prompt():
 def query(input):
     if input:
         # Initialize the language model with the specified model name
-        llm = ChatOllama(model=LLM_MODEL)
+        llm = ChatOllama(model=settings.LLM_MODEL)
         # Get the vector database instance
         db = get_vector_db()
         # Get the prompt templates

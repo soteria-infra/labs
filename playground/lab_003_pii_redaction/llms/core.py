@@ -1,11 +1,12 @@
 import os
 import shutil
+
+from config import settings
 from llms.query import query
 
 from custom_loggers import DEFAULT_LOGGER
 
-TEMP_FOLDER = os.getenv("TEMP_FOLDER", "./_temp")
-os.makedirs(TEMP_FOLDER, exist_ok=True)
+os.makedirs(settings.TEMP_FOLDER, exist_ok=True)
 
 
 def upload_to_temp(file_path: str) -> str:
@@ -17,7 +18,7 @@ def upload_to_temp(file_path: str) -> str:
         raise FileNotFoundError(f"Source file not found: {file_path}")
 
     file_name = os.path.basename(file_path)
-    destination_path = os.path.join(TEMP_FOLDER, file_name)
+    destination_path = os.path.join(settings.TEMP_FOLDER, file_name)
 
     try:
         shutil.copy(file_path, destination_path)

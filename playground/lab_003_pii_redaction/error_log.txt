@@ -1,0 +1,164 @@
+ERROR:root:Error parsing line: [
+Error: '[' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_16]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_24]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1001",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_25]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2001",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_4]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_17]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_26]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1002",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_27]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2002",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_5]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_18]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_28]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1003",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_29]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2003",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_6]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_19]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_30]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1004",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_31]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2004",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_7]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_20],
+Error: unterminated string literal (detected at line 1) (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_32]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1005",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_33]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2005",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_8]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_21]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_34]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1006",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_35]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2006",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_9]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_22]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_36]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1007",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_37]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2007",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_10]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_23]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_38]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1008",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_39]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2008",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_11]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "Ivy King",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_40]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1009",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_41]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2009",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_12]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   },
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line:   {
+Error: '{' was never closed (<unknown>, line 1)
+ERROR:root:Error parsing line:     "name": "[REDACTED_PERSON_24]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "email": "[REDACTED_EMAIL_ADDRESS_42]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "phone_number": "+1-555-100-1010",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "business_email": "[REDACTED_EMAIL_ADDRESS_43]",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "work_phone": "+1-555-200-2010",
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:     "ip_address": "[REDACTED_IP_ADDRESS_13]"
+Error: invalid syntax (<unknown>, line 1)
+ERROR:root:Error parsing line:   }
+Error: unmatched '}' (<unknown>, line 1)
+ERROR:root:Error parsing line: ]
+Error: unmatched ']' (<unknown>, line 1)

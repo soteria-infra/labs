@@ -6,10 +6,13 @@ from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import settings
+from llms.core import LLMResult
 from llms.get_vector_db import get_vector_db
 
 from custom_loggers import DEFAULT_LOGGER
 from fastapi import UploadFile
+import json
+from langchain_core.documents import Document
 
 
 def is_allowed_file_type(filename: str) -> bool:
@@ -32,18 +35,12 @@ def save_file(file: UploadFile) -> Path:
 
 
 # Function to load and split the data from the JSON file
-def load_and_split_data(file_path):
+def load_and_split_data(file_path: Path) -> list[Document] | None:
     try:
         DEFAULT_LOGGER.info(f"Loading JSON file: {file_path}")
 
-        # Skip JSONLoader entirely and handle JSON manually for better control
-        import json
-
-        with open(file_path, "r", encoding="utf-8") as f:
+        with file_path.open('r', encoding='utf-8') as f:
             json_data = json.load(f)
-
-        # Import Document class
-        from langchain_core.documents import Document
 
         # Convert JSON to string format for text processing
         if isinstance(json_data, dict):
@@ -113,7 +110,7 @@ def load_and_split_data(file_path):
 
 
 # Main function to handle the embedding process for file objects (Flask uploads)
-def embed_file_from_obj(file: UploadFile):
+def embed_file_from_obj(file: UploadFile) -> LLMResult:
     """Handle embedding for file objects (like Flask uploads)"""
     if file and file.filename != "" and is_allowed_file_type(file.filename):
         try:
@@ -137,7 +134,7 @@ def embed_file_from_obj(file: UploadFile):
 
 
 # Main function to handle the embedding process for file paths (strings)
-def embed_file_from_path(file_path):
+def embed_file_from_path(file_path: Path) -> LLMResult:
     """Handle embedding for file paths (strings)"""
     if not os.path.exists(file_path):
         return {"success": False, "error": f"File not found: {file_path}"}
@@ -166,7 +163,7 @@ def embed_file_from_path(file_path):
 
 
 # Unified embed function that handles both file objects and file paths
-def embed_file(file: UploadFile | Path | str) -> dict:
+def embed_file(file: UploadFile | Path | str) -> LLMResult:
     """
     Universal embed function that handles both file objects and file paths
     """

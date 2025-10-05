@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import (
     FastAPI,
     WebSocket,
@@ -12,7 +14,15 @@ from websocket.handler import handle_websocket as do_handle_websocket
 from api_handlers import handle_document_upload as do_handle_document_upload
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    settings.TEMP_FOLDER.mkdir(exist_ok=True)
+    yield
+    # Clean up here...
+    # TODO: might cleanup temp folder on server shutdown
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

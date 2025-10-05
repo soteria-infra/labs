@@ -8,6 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
 from config import settings
+from llms.core import LLMResult
 from llms.get_vector_db import get_vector_db
 import soteria_sdk
 from dotenv import load_dotenv
@@ -45,7 +46,9 @@ def save_file(file: UploadFile) -> Path:
     timestamp = datetime.now().timestamp()
     filename = f"{timestamp}_{secure_filename(file.filename)}"
     destination = settings.TEMP_FOLDER / filename
-    file.save(destination) # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
+    file.save(
+        destination
+    )  # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
     return destination
 
 
@@ -58,10 +61,10 @@ def scan_pii_with_soteria(prompt: str) -> str:
     return prompt
 
 
-def load_and_process_json(file_path):
+def load_and_process_json(file_path: Path) -> list[Document] | None:
     """Load JSON file, scan for pii, and convert to documents"""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with file_path.open("r", encoding="utf-8") as f:
             raw_content = f.read()
 
         try:
@@ -151,7 +154,7 @@ def load_and_process_json(file_path):
         return None
 
 
-def embed_file_from_obj(file: UploadFile):
+def embed_file_from_obj(file: UploadFile) -> LLMResult:
     """Handle embedding for file objects (Flask uploads)"""
     DEFAULT_LOGGER.debug(
         f"embed_file_object called with file: {file.filename if hasattr(file, 'filename') else 'unknown'}"
@@ -189,7 +192,7 @@ def embed_file_from_obj(file: UploadFile):
     return {"success": False, "error": "Invalid file or file type not allowed"}
 
 
-def embed_file_from_path(file_path: Path):
+def embed_file_from_path(file_path: Path) -> LLMResult:
     """Handle embedding for file paths (strings)"""
     DEFAULT_LOGGER.debug(f"embed_file_path called with: {file_path}")
 
@@ -228,7 +231,7 @@ def embed_file_from_path(file_path: Path):
         return {"success": False, "error": str(e)}
 
 
-def embed_file(file: UploadFile | Path | str) -> dict:
+def embed_file(file: UploadFile | Path | str) -> LLMResult:
     """
     Universal embed function that handles both file objects and file paths
     """

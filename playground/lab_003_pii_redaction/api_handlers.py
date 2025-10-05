@@ -21,14 +21,12 @@ async def handle_document_upload(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No file uploaded."
         )
 
-    # Ensure the TEMP_FOLDER exists
-    os.makedirs(settings.TEMP_FOLDER, exist_ok=True)
-    temp_file_path = os.path.join(settings.TEMP_FOLDER, file.filename)
+    temp_file_path = settings.TEMP_FOLDER / file.filename
 
     try:
         # Save the uploaded file temporarily
-        with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        with temp_file_path.open("wb") as destination:
+            shutil.copyfileobj(file.file, destination)
 
         is_protected = True
         if protection_modes:
@@ -74,7 +72,7 @@ async def handle_document_upload(
         )
     finally:
         # Ensure the temporary file is removed after processing.
-        if os.path.exists(temp_file_path):
+        if temp_file_path.exists():
             try:
                 os.remove(temp_file_path)
                 DEFAULT_LOGGER.debug(f"Temporary file '{temp_file_path}' removed.")

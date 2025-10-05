@@ -1,13 +1,19 @@
-import os
 import shutil
 from pathlib import Path
+from typing import TypedDict, NotRequired
 
 from config import settings
 from llms.query import query
 
 from custom_loggers import DEFAULT_LOGGER
 
-os.makedirs(settings.TEMP_FOLDER, exist_ok=True)
+
+class LLMResult(TypedDict):
+    success: bool
+    message: NotRequired[str]
+    results: NotRequired[list]
+    error: NotRequired[str]
+    details: NotRequired["LLMResult"]
 
 
 def upload_to_temp(file_path: Path) -> Path:
@@ -36,7 +42,7 @@ def upload_to_temp(file_path: Path) -> Path:
         raise error
 
 
-def query_db(user_query: str) -> dict:
+def query_db(user_query: str) -> LLMResult:
     """
     Performs a query against the vector database.
     """
@@ -74,7 +80,7 @@ def query_db(user_query: str) -> dict:
             # If query returns a list of results
             DEFAULT_LOGGER.debug(f"Query processed successfully for: '{user_query}'")
             results = []
-            for i, item in enumerate(response):
+            for item in response:
                 if isinstance(item, str):
                     results.append({"score": 1.0, "document": item})
                 elif isinstance(item, dict):
@@ -110,16 +116,16 @@ def query_chat_processing_fn(context: str, user_input: str) -> str:
         query_response = query_db(user_input)
 
         if query_response["success"]:
-            if query_response["results"]:
+            if results := query_response.get("results"):
                 response_text = "Here's what I found:\n\n"
-                for i, res in enumerate(query_response["results"]):
-                    score = res.get("score", "N/A")
+                for i, result in enumerate(results):
+                    score = result.get("score", "N/A")
                     score_str = (
                         f"{score:.2f}"
                         if isinstance(score, (int, float))
                         else str(score)
                     )
-                    document = res.get("document", "N/A")
+                    document = result.get("document", "N/A")
 
                     # Show more of the document content for better answers
                     if len(str(document)) > 500:

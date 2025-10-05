@@ -3,6 +3,7 @@ from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain_core.runnables.utils import Input
 
 from config import settings
 from llms.get_vector_db import get_vector_db
@@ -30,8 +31,8 @@ def get_prompt():
 
 
 # Main function to handle the query process
-def query(input):
-    if input:
+def query(input_: Input) -> str | None:
+    if input_:
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=settings.LLM_MODEL)
         # Get the vector database instance
@@ -52,7 +53,7 @@ def query(input):
             | StrOutputParser()
         )
 
-        response = chain.invoke(input)
+        response = chain.invoke(input_)
 
         return response
 

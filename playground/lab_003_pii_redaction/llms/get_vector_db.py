@@ -10,6 +10,6 @@ def get_vector_db():
     )
     return Chroma(
         collection_name=settings.COLLECTION_NAME,
-        persist_directory=settings.CHROMA_PATH,
+        persist_directory=settings.CHROMA_PATH.as_posix(),
         embedding_function=embedding,
     )

@@ -6,7 +6,7 @@ from llms.cli import get_conversation_handle_fn
 from llms.core import query_chat_processing_fn
 
 
-from llms.embed import embed
+from llms.embed import embed_file
 from custom_loggers import DEFAULT_LOGGER
 
 
@@ -36,7 +36,7 @@ def process_and_embed_file(file_path: str) -> dict:
             )
 
         # Use the file path directly since embed() now handles string paths
-        embedding_result = embed(temp_filepath)
+        embedding_result = embed_file(temp_filepath)
 
         if embedding_result and embedding_result.get("success", True):
             DEFAULT_LOGGER.debug(f"File '{filename}' embedded successfully.")

@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 import shutil
 
 from config import settings
@@ -7,11 +6,8 @@ from llms.cli import get_conversation_handle_fn
 
 
 from llms.core import query_chat_processing_fn
-from llms.protected_embed import embed
+from llms.protected_embed import embed_file
 from custom_loggers import DEFAULT_LOGGER
-
-
-load_dotenv()
 
 
 def process_and_embed_file_protected(file_path: str) -> dict:
@@ -40,7 +36,7 @@ def process_and_embed_file_protected(file_path: str) -> dict:
             )
 
         # Use the file path directly since embed() now handles string paths
-        embedding_result = embed(temp_filepath)
+        embedding_result = embed_file(temp_filepath)
 
         if embedding_result and embedding_result.get("success", True):
             DEFAULT_LOGGER.debug(f"File '{filename}' embedded successfully.")

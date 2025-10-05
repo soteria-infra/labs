@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 
 from config import settings
 from llms.query import query
@@ -9,30 +10,30 @@ from custom_loggers import DEFAULT_LOGGER
 os.makedirs(settings.TEMP_FOLDER, exist_ok=True)
 
 
-def upload_to_temp(file_path: str) -> str:
+def upload_to_temp(file_path: Path) -> Path:
     """
     Copies a file to a temporary location and returns the path to the copied file.
     """
-    if not os.path.exists(file_path):
+    if not file_path.exists():
         DEFAULT_LOGGER.debug(f"Source file not found: {file_path}")
         raise FileNotFoundError(f"Source file not found: {file_path}")
 
-    file_name = os.path.basename(file_path)
-    destination_path = os.path.join(settings.TEMP_FOLDER, file_name)
+    file_name = file_path.name
+    destination = settings.TEMP_FOLDER / file_name
 
     try:
-        shutil.copy(file_path, destination_path)
+        shutil.copy(file_path, destination)
         (
             DEFAULT_LOGGER.debug(
-                f"File '{file_name}' copied to temporary location: {destination_path}"
+                f"File '{file_name}' copied to temporary location: {destination}"
             )
         )
-        return destination_path
-    except IOError as e:
+        return destination
+    except IOError as error:
         DEFAULT_LOGGER.error(
-            f"Error copying file '{file_name}' to '{destination_path}': {e}"
+            f"Error copying file '{file_name}' to '{destination}': {error}"
         )
-        raise IOError(f"Failed to copy file: {e}")
+        raise error
 
 
 def query_db(user_query: str) -> dict:

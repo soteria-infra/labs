@@ -73,7 +73,7 @@ def process_and_embed_file(file_path: Path) -> LLMResult:
         )
         return {"success": False, "error": f"Internal error: {e}"}
     finally:
-        if cleanup_temp_file and os.path.exists(temp_filepath):
+        if cleanup_temp_file and temp_filepath.exists():
             os.remove(temp_filepath)
             DEFAULT_LOGGER.debug(f"Temporary file '{temp_filepath}' removed.")
 

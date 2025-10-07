@@ -35,7 +35,7 @@ def allowed_file(filename: str) -> bool:
     """
     Checks if the file type is allowed for the given filename.
     """
-    return Path(filename).suffix.lower() in {"json"}
+    return Path(filename).suffix.lower() in {".json"}
 
 
 def save_file(file: UploadFile) -> Path:
@@ -101,7 +101,7 @@ def load_and_process_json(file_path: Path) -> list[Document] | None:
             documents.append(
                 Document(
                     page_content=content,
-                    metadata={"source": file_path, "type": "json_object"},
+                    metadata={"source": file_path.as_posix(), "type": "json_object"},
                 )
             )
 
@@ -115,7 +115,7 @@ def load_and_process_json(file_path: Path) -> list[Document] | None:
                     Document(
                         page_content=content,
                         metadata={
-                            "source": file_path,
+                            "source": file_path.as_posix(),
                             "item_index": i,
                             "type": "json_array_item",
                         },
@@ -127,7 +127,7 @@ def load_and_process_json(file_path: Path) -> list[Document] | None:
             documents.append(
                 Document(
                     page_content=content,
-                    metadata={"source": file_path, "type": "json_primitive"},
+                    metadata={"source": file_path.as_posix(), "type": "json_primitive"},
                 )
             )
             DEFAULT_LOGGER.info("Created 1 document from JSON primitive")

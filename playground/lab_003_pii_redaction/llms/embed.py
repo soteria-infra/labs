@@ -19,7 +19,7 @@ def is_allowed_file_type(filename: str) -> bool:
     """
     Checks if the file type is allowed for the given filename.
     """
-    return Path(filename).suffix.lower() in {"json"}
+    return Path(filename).suffix.lower() in {".json"}
 
 
 def save_file(file: UploadFile) -> Path:
@@ -30,7 +30,9 @@ def save_file(file: UploadFile) -> Path:
     timestamp = datetime.now().timestamp()
     filename = f"{timestamp}_{secure_filename(file.filename)}"
     destination = settings.TEMP_FOLDER / filename
-    file.save(destination) # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
+    file.save(
+        destination
+    )  # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
     return destination
 
 
@@ -39,7 +41,7 @@ def load_and_split_data(file_path: Path) -> list[Document] | None:
     try:
         DEFAULT_LOGGER.info(f"Loading JSON file: {file_path}")
 
-        with file_path.open('r', encoding='utf-8') as f:
+        with file_path.open("r", encoding="utf-8") as f:
             json_data = json.load(f)
 
         # Convert JSON to string format for text processing
@@ -49,7 +51,7 @@ def load_and_split_data(file_path: Path) -> list[Document] | None:
             data = [
                 Document(
                     page_content=content,
-                    metadata={"source": file_path, "type": "json_object"},
+                    metadata={"source": file_path.as_posix(), "type": "json_object"},
                 )
             ]
             DEFAULT_LOGGER.info(f"Processed JSON object with {len(content)} characters")
@@ -66,7 +68,7 @@ def load_and_split_data(file_path: Path) -> list[Document] | None:
                     Document(
                         page_content=content,
                         metadata={
-                            "source": file_path,
+                            "source": file_path.as_posix(),
                             "item_index": i,
                             "type": "json_array_item",
                         },
@@ -80,7 +82,7 @@ def load_and_split_data(file_path: Path) -> list[Document] | None:
             data = [
                 Document(
                     page_content=content,
-                    metadata={"source": file_path, "type": "json_primitive"},
+                    metadata={"source": file_path.as_posix(), "type": "json_primitive"},
                 )
             ]
             DEFAULT_LOGGER.info(f"Processed JSON primitive: {type(json_data).__name__}")

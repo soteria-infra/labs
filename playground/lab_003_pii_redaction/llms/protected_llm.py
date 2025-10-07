@@ -104,7 +104,6 @@ def run():
 
     # Validate that it's actually valid JSON
     try:
-
         with open(file_to_embed_path, "r", encoding="utf-8") as f:
             json.load(f)
         DEFAULT_LOGGER.debug(f"✓ Valid JSON file detected: {file_to_embed_path}")

@@ -161,4 +161,4 @@ def query_chat_processing_fn(context: str, user_input: str) -> str:
         DEFAULT_LOGGER.debug(f"Chatbot: {error_msg}")
         context += f"\nUser: {user_input}\nChatbot: Error: {e}"
 
-    return context
+    return context, response_text

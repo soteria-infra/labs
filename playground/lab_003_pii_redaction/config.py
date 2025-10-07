@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     COLLECTION_NAME: str = "local-rag"
     TEXT_EMBEDDING_MODEL: str = "nomic-embed-text"
 
+    SERVER_HOST: str = "0.0.0.0"
+    SERVER_PORT: int = 8000
+
     @computed_field
     @property
     def TEMP_FOLDER(self) -> Path:

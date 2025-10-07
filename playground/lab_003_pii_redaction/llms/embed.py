@@ -1,43 +1,46 @@
 import os
 from datetime import datetime
+from pathlib import Path
+
 from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import settings
+from llms.core import LLMResult
 from llms.get_vector_db import get_vector_db
 
 from custom_loggers import DEFAULT_LOGGER
+from fastapi import UploadFile
+import json
+from langchain_core.documents import Document
 
 
-# Function to check if the uploaded file is allowed
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in {"json"}
+def is_allowed_file_type(filename: str) -> bool:
+    """
+    Checks if the file type is allowed for the given filename.
+    """
+    return Path(filename).suffix.lower() in {"json"}
 
 
-# Function to save the uploaded file to the temporary folder (for file objects)
-def save_file(file):
+def save_file(file: UploadFile) -> Path:
+    """
+    Saves the given uploaded file to disk and returns the path.
+    """
     # Save the uploaded file with a secure filename and return the file path
-    ct = datetime.now()
-    ts = ct.timestamp()
-    filename = str(ts) + "_" + secure_filename(file.filename)
-    file_path = os.path.join(settings.TEMP_FOLDER, filename)
-    file.save(file_path)
-    return file_path
+    timestamp = datetime.now().timestamp()
+    filename = f"{timestamp}_{secure_filename(file.filename)}"
+    destination = settings.TEMP_FOLDER / filename
+    file.save(destination) # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
+    return destination
 
 
 # Function to load and split the data from the JSON file
-def load_and_split_data(file_path):
+def load_and_split_data(file_path: Path) -> list[Document] | None:
     try:
         DEFAULT_LOGGER.info(f"Loading JSON file: {file_path}")
 
-        # Skip JSONLoader entirely and handle JSON manually for better control
-        import json
-
-        with open(file_path, "r", encoding="utf-8") as f:
+        with file_path.open('r', encoding='utf-8') as f:
             json_data = json.load(f)
-
-        # Import Document class
-        from langchain_core.documents import Document
 
         # Convert JSON to string format for text processing
         if isinstance(json_data, dict):
@@ -107,9 +110,9 @@ def load_and_split_data(file_path):
 
 
 # Main function to handle the embedding process for file objects (Flask uploads)
-def embed_file_object(file):
+def embed_file_from_obj(file: UploadFile) -> LLMResult:
     """Handle embedding for file objects (like Flask uploads)"""
-    if file.filename != "" and file and allowed_file(file.filename):
+    if file and file.filename != "" and is_allowed_file_type(file.filename):
         try:
             file_path = save_file(file)
             chunks = load_and_split_data(file_path)
@@ -131,13 +134,13 @@ def embed_file_object(file):
 
 
 # Main function to handle the embedding process for file paths (strings)
-def embed_file_path(file_path):
+def embed_file_from_path(file_path: Path) -> LLMResult:
     """Handle embedding for file paths (strings)"""
     if not os.path.exists(file_path):
         return {"success": False, "error": f"File not found: {file_path}"}
 
     filename = os.path.basename(file_path)
-    if not allowed_file(filename):
+    if not is_allowed_file_type(filename):
         return {
             "success": False,
             "error": "File type not allowed. Only JSON files are supported.",
@@ -160,17 +163,19 @@ def embed_file_path(file_path):
 
 
 # Unified embed function that handles both file objects and file paths
-def embed(file_or_path):
+def embed_file(file: UploadFile | Path | str) -> LLMResult:
     """
     Universal embed function that handles both file objects and file paths
     """
     # Check if it's a file object (has filename attribute) or a string path
-    if hasattr(file_or_path, "filename"):
+    if hasattr(file, "filename"):
         # It's a file object (like from Flask upload)
-        return embed_file_object(file_or_path)
-    elif isinstance(file_or_path, str):
+        return embed_file_from_obj(file)
+    elif isinstance(file, str):
         # It's a file path string
-        return embed_file_path(file_or_path)
+        return embed_file_from_path(Path(file))
+    elif isinstance(file, Path):
+        return embed_file_from_path(file)
     else:
         return {
             "success": False,

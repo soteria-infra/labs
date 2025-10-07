@@ -1,17 +1,21 @@
 import os
 import json
 from datetime import datetime
+from pathlib import Path
+
 from werkzeug.utils import secure_filename
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
 from config import settings
+from llms.core import LLMResult
 from llms.get_vector_db import get_vector_db
 import soteria_sdk
 from dotenv import load_dotenv
 
 from llms.utils import clean_json_str
 from custom_loggers import DEFAULT_LOGGER
+from fastapi import UploadFile
 
 load_dotenv()
 
@@ -27,19 +31,25 @@ else:
     DEFAULT_LOGGER.warn("No Soteria API Key found!")
 
 
-def allowed_file(filename):
-    """Check if the uploaded file is allowed"""
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in {"json"}
+def allowed_file(filename: str) -> bool:
+    """
+    Checks if the file type is allowed for the given filename.
+    """
+    return Path(filename).suffix.lower() in {"json"}
 
 
-def save_file(file):
-    """Save the uploaded file to the temporary folder (for Flask uploads)"""
-    ct = datetime.now()
-    ts = ct.timestamp()
-    filename = str(ts) + "_" + secure_filename(file.filename)
-    file_path = os.path.join(settings.TEMP_FOLDER, filename)
-    file.save(file_path)
-    return file_path
+def save_file(file: UploadFile) -> Path:
+    """
+    Saves the given uploaded file to disk and returns the path.
+    """
+    # Save the uploaded file with a secure filename and return the file path
+    timestamp = datetime.now().timestamp()
+    filename = f"{timestamp}_{secure_filename(file.filename)}"
+    destination = settings.TEMP_FOLDER / filename
+    file.save(
+        destination
+    )  # TODO: Verify i'm annotating with the right file type (why is save showing a warning)
+    return destination
 
 
 @soteria_sdk.guard_pii_redactor
@@ -51,10 +61,10 @@ def scan_pii_with_soteria(prompt: str) -> str:
     return prompt
 
 
-def load_and_process_json(file_path):
+def load_and_process_json(file_path: Path) -> list[Document] | None:
     """Load JSON file, scan for pii, and convert to documents"""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with file_path.open("r", encoding="utf-8") as f:
             raw_content = f.read()
 
         try:
@@ -144,7 +154,7 @@ def load_and_process_json(file_path):
         return None
 
 
-def embed_file_object(file):
+def embed_file_from_obj(file: UploadFile) -> LLMResult:
     """Handle embedding for file objects (Flask uploads)"""
     DEFAULT_LOGGER.debug(
         f"embed_file_object called with file: {file.filename if hasattr(file, 'filename') else 'unknown'}"
@@ -182,7 +192,7 @@ def embed_file_object(file):
     return {"success": False, "error": "Invalid file or file type not allowed"}
 
 
-def embed_file_path(file_path):
+def embed_file_from_path(file_path: Path) -> LLMResult:
     """Handle embedding for file paths (strings)"""
     DEFAULT_LOGGER.debug(f"embed_file_path called with: {file_path}")
 
@@ -221,21 +231,23 @@ def embed_file_path(file_path):
         return {"success": False, "error": str(e)}
 
 
-def embed(file_or_path):
+def embed_file(file: UploadFile | Path | str) -> LLMResult:
     """
     Universal embed function that handles both file objects and file paths
     """
-    DEFAULT_LOGGER.debug(f"embed() called with type: {type(file_or_path)}")
+    DEFAULT_LOGGER.debug(f"embed() called with type: {type(file)}")
 
-    if hasattr(file_or_path, "filename"):
+    if hasattr(file, "filename"):
         # It's a file object (like from Flask upload)
         DEFAULT_LOGGER.debug("Detected file object, calling embed_file_object")
-        return embed_file_object(file_or_path)
-    elif isinstance(file_or_path, str):
+        return embed_file_from_obj(file)
+    elif isinstance(file, str):
         # It's a file path string
         DEFAULT_LOGGER.debug("Detected file path string, calling embed_file_path")
-        return embed_file_path(file_or_path)
+        return embed_file_from_path(Path(file))
+    elif isinstance(file, Path):
+        return embed_file_from_path(file)
     else:
-        error_msg = f"Invalid input type: {type(file_or_path)}, expected file object or file path string"
+        error_msg = f"Invalid input type: {type(file)}, expected file object or file path string"
         DEFAULT_LOGGER.debug(f"{error_msg}")
         return {"success": False, "error": error_msg}

@@ -1,30 +1,31 @@
 import os
 import shutil
+from pathlib import Path
 
 from config import settings
 from llms.cli import get_conversation_handle_fn
-from llms.core import query_chat_processing_fn
+from llms.core import query_chat_processing_fn, LLMResult
 
-
-from llms.embed import embed
+from llms.embed import embed_file
 from custom_loggers import DEFAULT_LOGGER
+import json
 
 
-def process_and_embed_file(file_path: str) -> dict:
+def process_and_embed_file(file_path: Path) -> LLMResult:
     """
     Processes a file: saves it temporarily (if not already in temp),
     and then embeds it into the vector database.
     """
-    if not os.path.exists(file_path):
+    if not file_path.exists():
         DEFAULT_LOGGER.debug(f"Input file not found: {file_path}")
         return {"success": False, "error": f"File not found: {file_path}"}
 
-    filename = os.path.basename(file_path)
-    temp_filepath = os.path.join(settings.TEMP_FOLDER, filename)
+    filename = file_path.name
+    temp_filepath = settings.TEMP_FOLDER / filename
     cleanup_temp_file = False
 
     try:
-        if not os.path.abspath(file_path) == os.path.abspath(temp_filepath):
+        if not file_path == temp_filepath:
             shutil.copy(file_path, temp_filepath)
             DEFAULT_LOGGER.debug(
                 f"File '{filename}' copied temporarily to {temp_filepath}"
@@ -36,9 +37,9 @@ def process_and_embed_file(file_path: str) -> dict:
             )
 
         # Use the file path directly since embed() now handles string paths
-        embedding_result = embed(temp_filepath)
+        embedding_result = embed_file(temp_filepath)
 
-        if embedding_result and embedding_result.get("success", True):
+        if embedding_result["success"]:
             DEFAULT_LOGGER.debug(f"File '{filename}' embedded successfully.")
             return {
                 "success": True,
@@ -72,7 +73,7 @@ def process_and_embed_file(file_path: str) -> dict:
         )
         return {"success": False, "error": f"Internal error: {e}"}
     finally:
-        if cleanup_temp_file and os.path.exists(temp_filepath):
+        if cleanup_temp_file and temp_filepath.exists():
             os.remove(temp_filepath)
             DEFAULT_LOGGER.debug(f"Temporary file '{temp_filepath}' removed.")
 
@@ -81,20 +82,20 @@ def run():
     file_to_embed_path = input(
         "Please enter the path to the file you want to embed (e.g., 'my_document.json'): "
     )
-    file_to_embed_path = file_to_embed_path.strip()
+    file_to_embed_path = Path(file_to_embed_path.strip())
 
     if not file_to_embed_path:
         DEFAULT_LOGGER.debug("No file path provided. Exiting.")
         return
 
-    if not os.path.exists(file_to_embed_path):
+    if not file_to_embed_path.exists():
         DEFAULT_LOGGER.debug(
             f"File not found at '{file_to_embed_path}'. Please check the path and try again. Exiting."
         )
         return
 
     # Check if it's a JSON file
-    if not file_to_embed_path.lower().endswith(".json"):
+    if not file_to_embed_path.suffix.endswith(".json"):
         DEFAULT_LOGGER.debug(
             f"Only JSON files are supported. '{file_to_embed_path}' is not a JSON file. Exiting."
         )
@@ -102,9 +103,7 @@ def run():
 
     # Validate that it's actually valid JSON
     try:
-        import json
-
-        with open(file_to_embed_path, "r", encoding="utf-8") as f:
+        with file_to_embed_path.open("r", encoding="utf-8") as f:
             json.load(f)
         DEFAULT_LOGGER.debug(f"✓ Valid JSON file detected: {file_to_embed_path}")
     except json.JSONDecodeError as e:

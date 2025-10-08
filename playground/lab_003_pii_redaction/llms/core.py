@@ -104,13 +104,14 @@ def query_db(user_query: str) -> LLMResult:
         return {"success": False, "error": f"Internal error during query: {e}"}
 
 
-def query_chat_processing_fn(context: str, user_input: str) -> str:
+def query_chat_processing_fn(context: str, user_input: str) -> tuple[str, str]:
     """
     Processes user input as a query to the vector database.
     The 'context' here is the accumulated chat history,
     but `perform_db_query` doesn't directly use it for retrieval.
     It's maintained for the overall chat flow.
     """
+    response_text = ""
     try:
         DEFAULT_LOGGER.debug("Chatbot: Searching...")
         query_response = query_db(user_input)
@@ -161,4 +162,4 @@ def query_chat_processing_fn(context: str, user_input: str) -> str:
         DEFAULT_LOGGER.debug(f"Chatbot: {error_msg}")
         context += f"\nUser: {user_input}\nChatbot: Error: {e}"
 
-    return context
+    return context, response_text
